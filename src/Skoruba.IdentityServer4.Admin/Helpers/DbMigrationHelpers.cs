@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Skoruba.IdentityServer4.Admin.Configuration.Constants;
-using Skoruba.IdentityServer4.Admin.Configuration.Identity;
 using Skoruba.IdentityServer4.Admin.Configuration.IdentityServer;
 using Skoruba.IdentityServer4.Admin.Configuration.Interfaces;
 using Skoruba.IdentityServer4.Admin.EntityFramework.DbContexts;
@@ -40,12 +39,12 @@ namespace Skoruba.IdentityServer4.Admin.Helpers
                 var context = scope.ServiceProvider.GetRequiredService<AdminDbContext>();
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserIdentity>>();
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<UserIdentityRole>>();
-
                 var rootConfiguration = scope.ServiceProvider.GetRequiredService<IRootConfiguration>();
 
                 context.Database.Migrate();
+
                 await EnsureSeedIdentityServerData(context, rootConfiguration.AdminConfiguration);
-                await EnsureSeedIdentityData(userManager, roleManager);
+                await EnsureSeedIdentityData(userManager, roleManager, rootConfiguration.AdminConfiguration);
             }
         }
 
@@ -53,7 +52,8 @@ namespace Skoruba.IdentityServer4.Admin.Helpers
         /// Generate default admin user / role
         /// </summary>
         private static async Task EnsureSeedIdentityData(UserManager<UserIdentity> userManager,
-            RoleManager<UserIdentityRole> roleManager)
+            RoleManager<UserIdentityRole> roleManager, 
+            IAdminConfiguration adminConfiguration)
         {
             // Create admin role
             if (!await roleManager.RoleExistsAsync(AuthorizationConsts.AdministrationRole))
@@ -64,16 +64,16 @@ namespace Skoruba.IdentityServer4.Admin.Helpers
             }
 
             // Create admin user
-            if (await userManager.FindByNameAsync(Users.AdminUserName) != null) return;
+            if (await userManager.FindByNameAsync(adminConfiguration.AdminUserName) != null) return;
 
             var user = new UserIdentity
             {
-                UserName = Users.AdminUserName,
-                Email = Users.AdminEmail,
+                UserName = adminConfiguration.AdminUserName,
+                Email = adminConfiguration.AdminEmail,
                 EmailConfirmed = true
             };
 
-            var result = await userManager.CreateAsync(user, Users.AdminPassword);
+            var result = await userManager.CreateAsync(user, adminConfiguration.AdminPassword);
 
             if (result.Succeeded)
             {

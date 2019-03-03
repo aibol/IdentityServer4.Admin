@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using IdentityModel;
@@ -245,6 +246,11 @@ namespace Skoruba.IdentityServer4.Admin.Helpers
                         {
                             OnMessageReceived = OnMessageReceived,
                             OnRedirectToIdentityProvider = n => OnRedirectToIdentityProvider(n, adminConfiguration)
+                        };
+
+                        options.BackchannelHttpHandler = new HttpClientHandler
+                        {
+                            ServerCertificateCustomValidationCallback = delegate { return true; }
                         };
                     });
             }

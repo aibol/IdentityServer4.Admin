@@ -7,5 +7,11 @@
         string IdentityServerBaseUrl { get; }
 
         string IdentityAdminBaseUrl { get; }
+
+        string AdminUserName { get; }
+
+        string AdminPassword { get; }
+
+        string AdminEmail { get; }
     }
 }
