@@ -20,6 +20,7 @@ namespace Skoruba.IdentityServer4.Admin
         {
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
+
             var builder = new ConfigurationBuilder()
                     .SetBasePath(env.ContentRootPath)
                     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
